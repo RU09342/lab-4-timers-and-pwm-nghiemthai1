@@ -2,7 +2,7 @@
 //   MSP430G2xxx Demo
 //      Button Interrupt
 //
-//   Description: Inturrupt a ongoing process by pushing a button
+//   Description: Interrupt a ongoing process by pushing a button
 //   ACLK = 32.768kHz, MCLK = SMCLK = default DCO~1MHz
 //
 //                MSP430F552x
