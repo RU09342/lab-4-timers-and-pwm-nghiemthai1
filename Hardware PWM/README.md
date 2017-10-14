@@ -35,5 +35,7 @@ However, the msp430FRxxx series (FR6989, FR2311, and FR5994 in this case) need t
 This high impedance serves to get rid of any cross currents, but is turned off later. <br />
 Also, the FR2311 doesn't have Timer_A, so Timer_B must be used inplace of Timer_A.
 # How to implement the code
-To run this code, simply import it into code composer, then click build. 
-After you plug in your MSP430, hit debug. When you press the button, LED1 one the board should change its state
+To run this code, import it into code composer, then click build. 
+After you plug in your MSP430, hit debug. <br />
+You will then need to connect the out put for Timer_A of PWM to the LED1.0
+When you press the button, LED1 one the board should change its state

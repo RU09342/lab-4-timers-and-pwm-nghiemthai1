@@ -1,28 +1,47 @@
-# Software PWM
-Most microprocessors will have a Timer module, but depending on the device, some may not come with pre-built PWM modules. Instead, you may have to utilize software techniques to synthesize PWM on your own.
+# Read Me for Hardware PWM
+Author: Thai Nghiem (collaborated with Ardit Pranvoku)
 
-## Task
-You need to generate a 1kHz PWM signal with a duty cycle between 0% and 100%. Upon the processor starting up, you should PWM one of the on-board LEDs at a 50% duty cycle. Upon pressing one of the on-board buttons, the duty cycle of the LED should increase by 10%. Once you have reached 100%, your duty cycle should go back to 0% on the next button press. You also need to implement the other LED to light up when the Duty Cycle button is depressed and turns back off when it is let go. This is to help you figure out if the button has triggered multiple interrupts.
+Uses the timer to generate a signal that will cause an LED to blink at a designated PWM.
+The watchdog timer must be stopped with the line 
+```c
+WDTCTL = WDTPW + WDTHOLD or WDTCTL = WDTPW | WDTHOLD.
+```
+Else, the processor will reset. <br />
+The desired led pins and bits must be set to 1 to configure it to be an output.
+The desired button pin and bit must be to 0 to configure it to be an input .<br />
+Also,  PXREN |= BITX; must be used to enable the pullup resistor for that button. <br />    
+The processor is put into LPM4 to prepare for the interrupt from the button. <br />
+In the same line, GIE is enabled so the interrupt is not masked. <br />
 
-### Hints
-You really, really, really, really need to hook up the output of your LED pin to an oscilloscope to make sure that the duty cycle is accurate. Also, since you are going to be doing a lot of initialization, it would be helpful for all persons involved if you created your main function like:
-'''c
-int main(void)
-{
-	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
-	LEDSetup(); // Initialize our LEDS
-	ButtonSetup();  // Initialize our button
-	TimerA0Setup(); // Initialize Timer0
-	TimerA1Setup(); // Initialize Timer1
-	__bis_SR_register(LPM0_bits + GIE);       // Enter LPM0 w/ interrupt
-}
-'''
-This way, each of the steps in initialization can be isolated for easier understanding and debugging.
+TA0CTL is configured using the desired settings. We used Timer A, SMCLK, and up mode.
+```c
+TA0CTL = TASSEL_2 + MC_1
+```
 
+TA0CCR0 is initialized at 999.
+TA0CCR1 is initialized at 500, so the duty cycle is 50% at 1 kHz. This is because the LED
+is set at 999(CCR0) and reset at 500, (CCR1) therefore it's on half the time. <br \>
 
-## Extra Work
-### Linear Brightness
-Much like every other things with humans, not everything we interact with we perceive as linear. For senses such as sight or hearing, certain features such as volume or brightness have a logarithmic relationship with our senses. Instead of just incrementing by 10%, try making the brightness appear to change linearly. 
+The program uses a button based interrupt to change TA0CCR1.
+While the button is pressed, TA0CCR1 is increased by 100, adding 10% to the duty cycle.
+At 100% duty cycle, TA0CCR1 is reset to 0. 
 
-### Power Comparison
-Since you are effectively turning the LED off for some period of time, it should follow that the amount of power you are using over time should be less. Using Energy Trace, compare the power consumption of the different duty cycles. What happens if you use the pre-divider in the timer module for the PWM (does it consume less power)?
+When TAR hits CCR0, an interrupt is generated for the LED to turn on. 
+When TAR hits CCR1, an interrupt is generated for the LED to turn off.
+Thus, if CCR0 is at 999 and CCR1 is at 300, the LED will be on from
+999 to 300, and off from 300 to 999, a 30% duty cycle.
+
+Both interrupts generated from the timer check to make sure that 
+if CCR1 is 1000 or 0, it will not turn off or will turn off, respectively.
+This is done to make sure that if CCR1 is 1000, it never turns off since it should be at a 100%
+duty cycle.
+Similarly, if CCR1 is 0, it never turns on since it should be at a 100% duty cycle.
+
+## Changes across the boards
+There is not much changes on the code across the 5 boards in this project, except for the specific output pin number for each LED and button. <br />
+However, the msp430FRxxx series (FR6989, FR2311, and FR5994 in this case) need to use the line PM5CTL0 = ~LOCKLPM5 to disable the default high impedance on the board. 
+This high impedance serves to get rid of any cross currents, but is turned off later. <br \>
+Also, the FR2311 doesn't have Timer_A, so Timer_B must be used inplace of Timer_A.
+# How to implement the code
+To run this code, simply import it into code composer, then click build. 
+After you plug in your MSP430, hit debug. When you press the button, LED1 one the board should change its state
