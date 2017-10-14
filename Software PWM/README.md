@@ -20,7 +20,7 @@ TA0CTL = TASSEL_2 + MC_1
 
 TA0CCR0 is initialized at 999.
 TA0CCR1 is initialized at 500, so the duty cycle is 50% at 1 kHz. This is because the LED
-is set at 999(CCR0) and reset at 500, (CCR1) therefore it's on half the time. <br \>
+is set at 999(CCR0) and reset at 500, (CCR1) therefore it's on half the time. <br />
 
 The program uses a button based interrupt to change TA0CCR1.
 While the button is pressed, TA0CCR1 is increased by 100, adding 10% to the duty cycle.
@@ -40,7 +40,7 @@ Similarly, if CCR1 is 0, it never turns on since it should be at a 100% duty cyc
 ## Changes across the boards
 There is not much changes on the code across the 5 boards in this project, except for the specific output pin number for each LED and button. <br />
 However, the msp430FRxxx series (FR6989, FR2311, and FR5994 in this case) need to use the line PM5CTL0 = ~LOCKLPM5 to disable the default high impedance on the board. 
-This high impedance serves to get rid of any cross currents, but is turned off later. <br \>
+This high impedance serves to get rid of any cross currents, but is turned off later. <br />
 Also, the FR2311 doesn't have Timer_A, so Timer_B must be used inplace of Timer_A.
 # How to implement the code
 To run this code, simply import it into code composer, then click build. 
