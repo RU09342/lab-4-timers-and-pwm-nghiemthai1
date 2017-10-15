@@ -1,4 +1,4 @@
-# Read Me for Hardware PWM
+# Read Me for Software PWM
 Author: Thai Nghiem (collaborated with Ardit Pranvoku)
 
 Uses the timer to generate a signal that will cause an LED to blink at a designated PWM.
